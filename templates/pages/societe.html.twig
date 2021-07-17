@@ -1,0 +1,188 @@
+{% extends "base.html.twig" %} {% block title %} Liste des Société {% endblock %} {% block body %}
+<style>
+    .table th {
+        border: none !important;
+    }
+    
+    .card {
+        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.479)
+    }
+</style>
+<div class="container-fluid" style="margin-top : 10px">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-10">
+            <h3> Liste des Société </h3>
+            <button class="btn btn-info" data-toggle="modal" data-target="#add">Nouveau Société</button>
+            <div class="card" style="margin-top: 2%;">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="text-center" style="font-weight:100;font-size:0.9em">
+                                <th>Identification</th>
+                                <th>Nom de la société </th>
+                                <th>Description de la société</th>
+                                <th>Type de la société</th>
+                                <th>Code postal et Ville</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+
+                            {% for society in societys %}
+                            <tr>
+                                <td>SC{{ society.id }}</td>
+                                <td>{{ society.name }}</td>
+                                <td>{{ society.description }}</td>
+                                <td>
+                                    {% for type_society in society.TypeSociety %}
+                                    <p>{{ type_society.name }}</p> <br> {% endfor %}
+                                </td>
+                                <td>{{ society.ville.name }} &nbsp; {{ society.CodePostal.name }}</td>
+                                <td>
+                                    <button type="button" data-toggle="modal" data-target="#destroy" data-id="{{ society.id }}" class="btn btn-danger" data-toggle="button" aria-pressed="false"><i class="bi bi-trash"></i> &nbsp Supprimer</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="add" tabindex="-1" aria-labelledby="add" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add">Nouveau Société</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('society.store') }}" method="POST">
+                <div class="modal-body">
+                    <label for="name">Nom de la société</label>
+                    <input type="text" class="form-control" placeholder="Nom de la société" name="name" id="name" required>
+                    <label for="name">Description</label><br>
+                    <textarea name="description" id="description" cols="30" rows="10"></textarea> <br>
+                    <label for="name">Type de la société</label><br>
+                    <div>
+                        {% for type_societe in type_societes %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="{{ type_societe.id }}" name="type_society[]" id="type_societe{{ type_societe.id }}">
+                            <label class="form-check-label" for="type_societe{{ type_societe.id }}">{{ type_societe.name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <label style="margin-top: 2%;" for="name">Code postal :</label>
+                        <select name="code_postal" id="code_postal">
+                            {% for code_postal in code_postals %}
+                                <option value="{{ code_postal.id }}">{{ code_postal.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label style="margin-top: 2%;" for="name">Ville :</label> <br>
+                        <select name="ville" id="ville" required>
+                            
+                        </select>
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="destroy" tabindex="-1" aria-labelledby="destroy" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="destroy">Supprimer Code Postal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('society.destroy') }}" method="POST">
+                <div class="modal-body">
+                    <p>Voulez vous vraiment le supprimer ?</p>
+                    <input type="hidden" name="society_id" id="delete_id" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $("#destroy").on("show.bs.modal", function(event) {
+        var button = $(event.relatedTarget);
+        var id = button.attr('data-id');
+        $('#delete_id').val(id);
+    })
+</script>
+<script>
+    $('#code_postal').change(function() {
+        var id = $(this).find(':selected').val();
+        $.ajax({
+            type: 'GET',
+            url: '{{ path("home") }}ville/api/' + id,
+            success: function(data) {
+                // the next thing you want to do 
+                var $ville = $('#ville');
+                $ville.empty();
+                if (data.length > 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        console.log(data[i].id)
+                        $ville.append('<option id=' + data[i].id + ' value=' + data[i].id + '>' + data[i].name + '</option>');
+                    }
+                } else {
+                    $ville.append('<option id=""  value="">' + "Aucun Ville" + '</option>');
+                }
+
+
+                //manually trigger a change event for the contry so that the change handler will get triggered
+                $ville.change();
+            }
+        });
+
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        var id = $('#code_postal').find(':selected').val();
+        $.ajax({
+            type: 'GET',
+            url: '{{ path("home") }}ville/api/' + id,
+            success: function(data) {
+                // the next thing you want to do 
+                var $ville = $('#ville');
+                $ville.empty();
+                if (data.length > 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        console.log(data[i].id)
+                        $ville.append('<option id=' + data[i].id + ' value=' + data[i].id + '>' + data[i].name + '</option>');
+                    }
+                } else {
+                    $ville.append('<option id=""  value="">' + "Aucun Ville" + '</option>');
+                }
+
+
+                //manually trigger a change event for the contry so that the change handler will get triggered
+                $ville.change();
+            }
+        });
+    });
+</script>
+{% endblock %}

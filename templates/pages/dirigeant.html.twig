@@ -1,0 +1,124 @@
+{% extends "base.html.twig" %} {% block title %} Liste des Dirigeants {% endblock %} {% block body %}
+
+<div class="container-fluid" style="margin-top : 10px">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-10">
+            <h3> Liste des Dirigeants </h3>
+            <button class="btn btn-info" data-toggle="modal" data-target="#add">Nouveau Dirigeant</button>
+            <div class="card" style="margin-top: 2%;">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="text-center" style="font-weight:100;font-size:0.9em">
+                                <th>Identification</th>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Sexe</th>
+                                <th>Société</th>
+                                <th>Adresse mail</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dirigeant in dirigeants %}
+                            <tr class="text-center">
+                                <td>{{ dirigeant.id }}</td>
+                                <td>{{ dirigeant.name }}</td>
+                                <td>{{ dirigeant.lastname }}</td>
+                                <td>{% if dirigeant.sexe == 1 %} Femme {% else %} Homme {% endif %}</td>
+                                <td>{{ dirigeant.society.name }}</td>
+                                <td>{{ dirigeant.email }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#destroy" data-id="{{ dirigeant.id }}" aria-pressed="false"><i class="bi bi-trash"></i> &nbsp Supprimer</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="add" tabindex="-1" aria-labelledby="add" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add">Nouveau Société</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('dirigeant.store') }}" method="POST">
+                <div class="modal-body">
+                    <label for="name">Nom</label>
+                    <input type="text" class="form-control" placeholder="Nom" name="name" id="name" required>
+                    <label for="lastname">Prénom</label>
+                    <input type="text" class="form-control" placeholder="Prénom" name="lastname" id="lastname" required>
+                    <label for="lastname">Sexe</label> <br>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" value="1" name="sexe" id="femme" checked>
+                        <label class="form-check-label" for="femme">
+                            Femme
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" value="2" name="sexe" id="Homme">
+                        <label class="form-check-label" for="Homme">
+                            Homme
+                        </label>
+                    </div>
+                    <label for="email">Adresse Email</label>
+                    <input type="email" class="form-control" placeholder="Adresse email" name="email" id="email" required>
+                    <label for="name">Société</label><br>
+                    <div>
+                        <select name="society" id="society">
+                            {% for society in societys %}
+                                <option value="{{ society.id }}">{{ society.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="destroy" tabindex="-1" aria-labelledby="destroy" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="destroy">Supprimer Code Postal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('dirigeant.destroy') }}" method="POST">
+                <div class="modal-body">
+                    <p>Voulez vous vraiment le supprimer ?</p>
+                    <input type="hidden" name="dirigeant_id" id="delete_id" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $("#destroy").on("show.bs.modal", function(event) {
+        var button = $(event.relatedTarget);
+        var id = button.attr('data-id');
+        $('#delete_id').val(id);
+    })
+</script>
+{% endblock %}

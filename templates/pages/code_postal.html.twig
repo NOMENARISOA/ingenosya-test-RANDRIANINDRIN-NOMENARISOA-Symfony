@@ -1,0 +1,119 @@
+{% extends "base.html.twig" %} {% block title %} Liste Code postal {% endblock %} {% block body %}
+
+<div class="container-fluid" style="margin-top : 10px">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-10">
+            <h3> Liste Code postal </h3>
+            <button class="btn btn-info" data-toggle="modal" data-target="#add">Nouveau Code postal</button>
+            <div class="card" style="margin-top: 2%;">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="text-center" style="font-weight:100;font-size:0.9em">
+                                <th>Code postal</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for code_postal in code_postals %}
+                            <tr class="text-center">
+                                <td>{{ code_postal.name }}</td>
+                                <td>
+                                    <button type="button" data-toggle="modal" data-target="#edit" data-id="{{ code_postal.id }}" data-name="{{ code_postal.name }}" class="btn btn-primary" data-toggle="button" aria-pressed="false"><i class="bi bi-pencil-square"></i> &nbsp Modifier</button>
+                                    <button type="button" data-toggle="modal" data-target="#destroy" data-id="{{ code_postal.id }}" class="btn btn-danger" data-toggle="button" aria-pressed="false"><i class="bi bi-trash"></i> &nbsp Supprimer</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="add" tabindex="-1" aria-labelledby="add" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add">Nouveau code postal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('code_postal.store') }}" method="POST">
+                <div class="modal-body">
+                    <label for="name">Code postal</label>
+                    <input type="text" class="form-control" placeholder="Code postal" name="name" id="name" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="edit" tabindex="-1" aria-labelledby="edit" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit">Modifier Code Postal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('code_postal.update') }}" method="POST">
+                <div class="modal-body">
+                    <label for="name">Code postal</label>
+                    <input type="hidden" name="code_postal_id" id="edit_id" value="">
+                    <input type="text" class="form-control" placeholder="Code postal" name="name" id="edit_name" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="destroy" tabindex="-1" aria-labelledby="destroy" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="destroy">Supprimer Code Postal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('code_postal.destroy') }}" method="POST">
+                <div class="modal-body">
+                    <p>Voulez vous vraiment le supprimer ?</p>
+                    <input type="hidden" name="code_postal_id" id="delete_id" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $("#edit").on("show.bs.modal", function(event) {
+        var button = $(event.relatedTarget);
+        var id = button.attr('data-id');
+        var name = button.attr('data-name');
+        $('#edit_id').val(id);
+        $('#edit_name').val(name);
+    })
+</script>
+<script>
+    $("#destroy").on("show.bs.modal", function(event) {
+        var button = $(event.relatedTarget);
+        var id = button.attr('data-id');
+        $('#delete_id').val(id);
+    })
+</script>
+{% endblock %}
